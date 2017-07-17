@@ -1,9 +1,26 @@
 package adal
 
 import (
+	"encoding/json"
 	"errors"
+	"fmt"
+	"net/http"
 	"net/url"
 	"strings"
+)
+
+const (
+	instanceDiscoveryEndpoint = "https://login.windows.net/common/discovery/instance"
+)
+
+var (
+	wellKnownAuthorityHosts = []string{
+		"login.windows.net",
+		"login.microsoftonline.com",
+		"login.chinacloudapi.cn",
+		"login-us.microsoftonline.com",
+		"login.microsoftonline.de",
+	}
 )
 
 type Authority struct {
@@ -31,7 +48,71 @@ func NewAuthority(urlStr string, validateAuthority bool) (*Authority, error) {
 		Validated: !validateAuthority,
 		Host:      host,
 		Tenant:    tenant,
+	}, nil
+}
+
+func (a *Authority) baseURL() string {
+	return fmt.Sprintf("https://%s/%s", a.Host, a.Tenant)
+}
+
+func (a *Authority) AuthorityURL() string {
+	return a.baseURL() + "/oauth2/authorize"
+}
+
+func (a *Authority) TokenEndpoint() string {
+	return a.baseURL() + "/oauth2/token"
+}
+
+func (a *Authority) DeviceEndpoint() string {
+	return a.baseURL() + "/oauth2/devicecode"
+}
+
+func (a *Authority) Validate() error {
+	if a.Validated {
+		return nil
 	}
+	hostname := a.URL.Hostname()
+	for _, authorityHost := range wellKnownAuthorityHosts {
+		if hostname == authorityHost {
+			a.Validated = true
+			return nil
+		}
+	}
+
+	u, err := url.ParseRequestURI(instanceDiscoveryEndpoint)
+	if err != nil {
+		return err
+	}
+
+	query := u.Query()
+	query.Add("authorization_endpoint", a.AuthorityURL())
+	query.Add("api-version", "1.0")
+	resp, err := http.Get(u.String())
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode < 200 || 300 <= resp.StatusCode {
+		return errors.New("instance discovery request failed")
+	}
+
+	var out struct {
+		TenantDiscoveryEndpoint string `json:"tenant_discovery_endpoint"`
+	}
+	decoder := json.NewDecoder(resp.Body)
+	if err := decoder.Decode(&out); err != nil {
+		return err
+	}
+	if len(out.TenantDiscoveryEndpoint) == 0 {
+		return errors.New("failed to parse instance discovery")
+	}
+	a.Validated = true
+	return nil
+}
+
+func (a *Authority) IsADFSAuthority() bool {
+	return strings.ToLower(a.Tenant) == "adfs"
 }
 
 func validateAuthorityURL(aURL *url.URL) error {
