@@ -47,7 +47,7 @@ func validateAuthorityURL(aURL *url.URL) error {
 func parseAuthority(aURL *url.URL) (string, string, error) {
 	host := aURL.Host
 	pathParts := strings.Split(aURL.Path, "/")
-	if len(pathParts) == 1 {
+	if len(pathParts) == 1 || len(pathParts[1]) == 0 {
 		return "", "", errors.New("could not determine tenant")
 	}
 	tenant := pathParts[1]
