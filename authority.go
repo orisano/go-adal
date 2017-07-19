@@ -84,9 +84,11 @@ func (a *Authority) Validate() error {
 		return err
 	}
 
-	query := u.Query()
+	query := url.Values{}
 	query.Add("authorization_endpoint", a.AuthorityURL())
 	query.Add("api-version", "1.0")
+	u.RawQuery = query.Encode()
+
 	resp, err := http.Get(u.String())
 	if err != nil {
 		return err
