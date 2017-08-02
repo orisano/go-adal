@@ -2,6 +2,7 @@ package adal
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"net/url"
 
@@ -13,8 +14,14 @@ type AuthenticationContext struct {
 	Authority *Authority
 }
 
-func NewAuthenticationContext(urlStr string, validateAuthority bool) (*AuthenticationContext, error) {
-	authority, err := NewAuthority(urlStr, validateAuthority)
+func NewAuthenticationContext(tenant string, opts ...option) (*AuthenticationContext, error) {
+	options := defaultOption()
+	for _, opt := range opts {
+		opt(&options)
+	}
+	authorityUrl := fmt.Sprintf("https://%s/%s", options.AuthorityHost, tenant)
+
+	authority, err := NewAuthority(authorityUrl, options.ValidateAuthority)
 	if err != nil {
 		return nil, errors.Wrap(err, "authority create failed")
 	}

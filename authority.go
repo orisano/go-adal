@@ -14,15 +14,7 @@ const (
 	instanceDiscoveryEndpoint = "https://login.windows.net/common/discovery/instance"
 )
 
-var (
-	wellKnownAuthorityHosts = []string{
-		"login.windows.net",
-		"login.microsoftonline.com",
-		"login.chinacloudapi.cn",
-		"login-us.microsoftonline.com",
-		"login.microsoftonline.de",
-	}
-)
+
 
 type Authority struct {
 	URL    *url.URL
