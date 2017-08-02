@@ -2,11 +2,12 @@ package adal
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
 	"strings"
+
+	"github.com/pkg/errors"
 )
 
 const (
@@ -24,30 +25,31 @@ var (
 )
 
 type Authority struct {
-	URL       *url.URL
-	Validated bool
-	Host      string
-	Tenant    string
+	URL    *url.URL
+	Host   string
+	Tenant string
+
+	validated bool
 }
 
 func NewAuthority(urlStr string, validateAuthority bool) (*Authority, error) {
 	parsedURL, err := url.ParseRequestURI(urlStr)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrapf(err, "url parse failed: %s", urlStr)
 	}
 	if err := validateAuthorityURL(parsedURL); err != nil {
-		return nil, err
+		return nil, errors.Wrapf(err, "invalid authority url: %s", parsedURL.String())
 	}
 	host, tenant, err := parseAuthority(parsedURL)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrapf(err, "authority parse failed")
 	}
 
 	return &Authority{
 		URL:       parsedURL,
-		Validated: !validateAuthority,
 		Host:      host,
 		Tenant:    tenant,
+		validated: !validateAuthority,
 	}, nil
 }
 
@@ -59,29 +61,29 @@ func (a *Authority) AuthorityURL() string {
 	return a.baseURL() + "/oauth2/authorize"
 }
 
-func (a *Authority) TokenEndpoint() string {
+func (a *Authority) TokenURL() string {
 	return a.baseURL() + "/oauth2/token"
 }
 
-func (a *Authority) DeviceEndpoint() string {
+func (a *Authority) DeviceURL() string {
 	return a.baseURL() + "/oauth2/devicecode"
 }
 
-func (a *Authority) Validate() error {
-	if a.Validated {
+func (a *Authority) Validate(httpClient *http.Client) error {
+	if a.validated {
 		return nil
 	}
 	hostname := a.URL.Hostname()
 	for _, authorityHost := range wellKnownAuthorityHosts {
 		if hostname == authorityHost {
-			a.Validated = true
+			a.validated = true
 			return nil
 		}
 	}
 
 	u, err := url.ParseRequestURI(instanceDiscoveryEndpoint)
 	if err != nil {
-		return err
+		return errors.Wrapf(err, "invalid instance discovery endpoint, make a github issue")
 	}
 
 	query := url.Values{}
@@ -89,14 +91,14 @@ func (a *Authority) Validate() error {
 	query.Add("api-version", "1.0")
 	u.RawQuery = query.Encode()
 
-	resp, err := http.Get(u.String())
+	resp, err := httpClient.Get(u.String())
 	if err != nil {
 		return err
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode < 200 || 300 <= resp.StatusCode {
-		return errors.New("instance discovery request failed")
+		return errors.Errorf("instance discovery request failed: expected 2xx, actual %s", resp.Status)
 	}
 
 	var out struct {
@@ -104,17 +106,21 @@ func (a *Authority) Validate() error {
 	}
 	decoder := json.NewDecoder(resp.Body)
 	if err := decoder.Decode(&out); err != nil {
-		return err
+		return errors.Wrapf(err, "failed to parse response")
 	}
 	if len(out.TenantDiscoveryEndpoint) == 0 {
 		return errors.New("failed to parse instance discovery")
 	}
-	a.Validated = true
+	a.validated = true
 	return nil
 }
 
 func (a *Authority) IsADFSAuthority() bool {
 	return strings.ToLower(a.Tenant) == "adfs"
+}
+
+func (a *Authority) Validated() bool {
+	return a.validated
 }
 
 func validateAuthorityURL(aURL *url.URL) error {
