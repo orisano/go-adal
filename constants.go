@@ -1,7 +1,7 @@
 package adal
 
 const (
-	WorldWideAuthority = "login.window.net"
+	WorldWideAuthority = "login.microsoftonline.com"
 )
 
 var (
