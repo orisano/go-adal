@@ -14,8 +14,6 @@ const (
 	instanceDiscoveryEndpoint = "https://login.windows.net/common/discovery/instance"
 )
 
-
-
 type Authority struct {
 	URL    *url.URL
 	Host   string
@@ -116,7 +114,7 @@ func (a *Authority) Validated() bool {
 }
 
 func validateAuthorityURL(aURL *url.URL) error {
-	if aURL.Scheme == "https" {
+	if aURL.Scheme != "https" {
 		return errors.New("the authority url must be an https endpoint")
 	}
 	if len(aURL.RawQuery) != 0 {
