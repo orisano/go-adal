@@ -35,6 +35,15 @@ func NewAuthenticationContext(tenant string, opts ...option) (*AuthenticationCon
 }
 
 func (a *AuthenticationContext) Client(ctx context.Context, resource, clientID, clientSecret string) (*http.Client, error) {
+	if len(resource) == 0 {
+		return nil, errors.New("missing resource")
+	}
+	if len(clientID) == 0 {
+		return nil, errors.New("missing clientID")
+	}
+	if len(clientSecret) == 0 {
+		return nil, errors.New("missing clientSecret")
+	}
 	config := &clientcredentials.Config{
 		ClientID:     clientID,
 		ClientSecret: clientSecret,
