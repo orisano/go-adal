@@ -15,6 +15,10 @@ type AuthenticationContext struct {
 }
 
 func NewAuthenticationContext(tenant string, opts ...option) (*AuthenticationContext, error) {
+	if len(tenant) == 0 {
+		return nil, errors.New("missing tenant")
+	}
+
 	options := defaultOption()
 	for _, opt := range opts {
 		opt(&options)
