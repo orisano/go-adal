@@ -72,3 +72,14 @@ func TestAuthority_AuthorityURL(t *testing.T) {
 		t.Errorf("unexpected AuthorityURL. expected: %v, actual: %v", expected, actual)
 	}
 }
+
+func TestAuthority_DeviceURL(t *testing.T) {
+	u := "https://my.active-directory.url/tenant/"
+	authority := testAuthority(t, u, true)
+
+	expected := u + "oauth2/devicecode"
+	actual := authority.DeviceURL()
+	if actual != expected {
+		t.Errorf("unexpected DeviceURL. expected: %v, actual: %v", expected, actual)
+	}
+}
