@@ -62,4 +62,13 @@ func TestNewAuthority(t *testing.T) {
 	})
 }
 
+func TestAuthority_AuthorityURL(t *testing.T) {
+	u := "https://my.active-directory.url/tenant"
+	authority := testAuthority(t, u, true)
 
+	expected := u + "/oauth2/authorize"
+	actual := authority.AuthorityURL()
+	if actual != expected {
+		t.Errorf("unexpected AuthorityURL. expected: %v, actual: %v", expected, actual)
+	}
+}
