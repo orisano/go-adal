@@ -73,6 +73,17 @@ func TestAuthority_AuthorityURL(t *testing.T) {
 	}
 }
 
+func TestAuthority_TokenURL(t *testing.T) {
+	u := "https://my.active-directory.url/tenant"
+	authority := testAuthority(t, u, true)
+
+	expected := u + "/oauth2/token"
+	actual := authority.TokenURL()
+	if actual != expected {
+		t.Errorf("unexpected TokenURL. expected: %v, actual: %v", expected, actual)
+	}
+}
+
 func TestAuthority_DeviceURL(t *testing.T) {
 	u := "https://my.active-directory.url/tenant/"
 	authority := testAuthority(t, u, true)
