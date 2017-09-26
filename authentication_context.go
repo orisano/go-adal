@@ -3,10 +3,10 @@ package adal
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"net/url"
 
 	"github.com/pkg/errors"
-	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 )
 
@@ -34,7 +34,7 @@ func NewAuthenticationContext(tenant string, opts ...option) (*AuthenticationCon
 	}, nil
 }
 
-func (a *AuthenticationContext) TokenSourceFromClientCredentials(ctx context.Context, resource, clientID, clientSecret string) oauth2.TokenSource {
+func (a *AuthenticationContext) Client(ctx context.Context, resource, clientID, clientSecret string) (*http.Client, error) {
 	config := &clientcredentials.Config{
 		ClientID:     clientID,
 		ClientSecret: clientSecret,
@@ -43,5 +43,5 @@ func (a *AuthenticationContext) TokenSourceFromClientCredentials(ctx context.Con
 			"resource": {resource},
 		},
 	}
-	return config.TokenSource(ctx)
+	return config.Client(ctx), nil
 }
