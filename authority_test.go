@@ -52,6 +52,13 @@ func TestNewAuthority(t *testing.T) {
 				t.Errorf("accept query string")
 			}
 		})
+
+		t.Run("withoutTenant", func(t *testing.T) {
+			err := testInvalidAuthority(t, "https://login.microsoftonline.com", true)
+			if err == nil {
+				t.Errorf("accept without tenant")
+			}
+		})
 	})
 }
 
