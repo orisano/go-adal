@@ -119,3 +119,18 @@ func TestAuthority_Validate(t *testing.T) {
 		}
 	})
 }
+
+func TestAuthority_IsADFSAuthority(t *testing.T) {
+	t.Run("adfsCase", func(t *testing.T) {
+		authority := testAuthority(t, "https://my.activedirectory.test/adfs", true)
+		if !authority.IsADFSAuthority() {
+			t.Errorf("ADFS Authority can't recognized")
+		}
+	})
+	t.Run("notADFSCase", func(t *testing.T) {
+		authority := testAuthority(t, "https://my.activedirectory.test/notadfs", true)
+		if authority.IsADFSAuthority() {
+			t.Errorf("return true when not ADFS Authority case")
+		}
+	})
+}
