@@ -23,9 +23,9 @@ func NewAuthenticationContext(tenant string, opts ...option) (*AuthenticationCon
 	for _, opt := range opts {
 		opt(&options)
 	}
-	authorityUrl := fmt.Sprintf("https://%s/%s", options.AuthorityHost, tenant)
+	authorityURL := fmt.Sprintf("https://%s/%s", options.AuthorityHost, tenant)
 
-	authority, err := NewAuthority(authorityUrl, options.ValidateAuthority)
+	authority, err := NewAuthority(authorityURL, options.ValidateAuthority)
 	if err != nil {
 		return nil, errors.Wrap(err, "authority create failed")
 	}
