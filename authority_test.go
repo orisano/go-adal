@@ -1,6 +1,7 @@
 package adal
 
 import (
+	"net/http"
 	"net/url"
 	"testing"
 
@@ -93,4 +94,28 @@ func TestAuthority_DeviceURL(t *testing.T) {
 	if actual != expected {
 		t.Errorf("unexpected DeviceURL. expected: %v, actual: %v", expected, actual)
 	}
+}
+
+func TestAuthority_Validate(t *testing.T) {
+	t.Run("wellKnownAuthorityHostCase", func(t *testing.T) {
+		authority := testAuthority(t, "https://login.microsoftonline.com/tenant", true)
+		err := authority.Validate(http.DefaultClient)
+		if err != nil {
+			t.Errorf("wellKnownAuthorityHost rejected: %v", err)
+		}
+		if !authority.Validated() {
+			t.Errorf("validation failed")
+		}
+	})
+
+	t.Run("tenantDiscoveryNotFoundCase", func(t *testing.T) {
+		authority := testAuthority(t, "https://login.myactivedirectory.localhost/dummy.tenant.localhost", true)
+		err := authority.Validate(http.DefaultClient)
+		if err == nil {
+			t.Errorf("invalid tenant accepted")
+		}
+		if authority.Validated() {
+			t.Errorf("wrong status")
+		}
+	})
 }
