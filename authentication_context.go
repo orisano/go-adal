@@ -14,7 +14,7 @@ type AuthenticationContext struct {
 	Authority *Authority
 }
 
-func NewAuthenticationContext(tenant string, opts ...option) (*AuthenticationContext, error) {
+func NewAuthenticationContext(tenant string, opts ...Option) (*AuthenticationContext, error) {
 	if len(tenant) == 0 {
 		return nil, errors.New("missing tenant")
 	}

@@ -5,7 +5,7 @@ type options struct {
 	ValidateAuthority bool
 }
 
-type option func(*options)
+type Option func(*options)
 
 func defaultOption() options {
 	return options{
@@ -14,13 +14,13 @@ func defaultOption() options {
 	}
 }
 
-func SetAuthorityHost(authorityHost string) option {
+func SetAuthorityHost(authorityHost string) Option {
 	return func(options *options) {
 		options.AuthorityHost = authorityHost
 	}
 }
 
-func ValidateAuthority() option {
+func ValidateAuthority() Option {
 	return func(options *options) {
 		options.ValidateAuthority = true
 	}
