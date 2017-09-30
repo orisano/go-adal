@@ -63,9 +63,9 @@ func (a *Authority) Validate(httpClient *http.Client) error {
 	if a.validated {
 		return nil
 	}
-	hostname := a.URL.Hostname()
+	host := a.URL.Host
 	for _, authorityHost := range wellKnownAuthorityHosts {
-		if hostname == authorityHost {
+		if host == authorityHost {
 			a.validated = true
 			return nil
 		}
