@@ -10,14 +10,21 @@
 [[projects]]
   branch = "master"
   name = "golang.org/x/net"
-  packages = ["context","context/ctxhttp"]
-  revision = "0a9397675ba34b2845f758fe3cd68828369c6517"
+  packages = [
+    "context",
+    "context/ctxhttp"
+  ]
+  revision = "2491c5de3490fced2f6cff376127c667efeed857"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/oauth2"
-  packages = [".","clientcredentials","internal"]
-  revision = "bb50c06baba3d0c76f9d125c0719093e315b5b44"
+  packages = [
+    ".",
+    "clientcredentials",
+    "internal"
+  ]
+  revision = "cdc340f7c179dbbfa4afd43b7614e8fcadde4269"
 
 [solve-meta]
   analyzer-name = "dep"
