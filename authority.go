@@ -3,6 +3,8 @@ package adal
 import (
 	"encoding/json"
 	"fmt"
+	"io"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
@@ -98,6 +100,7 @@ func (a *Authority) Validate(httpClient *http.Client) error {
 	if err := decoder.Decode(&out); err != nil {
 		return errors.Wrapf(err, "failed to parse response")
 	}
+	io.Copy(ioutil.Discard, resp.Body)
 	if len(out.TenantDiscoveryEndpoint) == 0 {
 		return errors.New("failed to parse instance discovery")
 	}
