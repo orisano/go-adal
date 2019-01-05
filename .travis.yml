@@ -1,15 +1,11 @@
 env:
     global:
         - CC_TEST_REPORTER_ID=6870c204ea2da7c81fdf40369b4f752340d22e7c51a73d429f48381ad3f1bd34
+        - GO111MOD=on
 
 language: go
 go:
-    - "1.9"
-    - "1.10"
-
-install:
-    - go get -u github.com/golang/dep/cmd/dep
-    - dep ensure -vendor-only
+    - "1.11"
 
 before_script:
     - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
