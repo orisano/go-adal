@@ -3,7 +3,12 @@
 <a href="https://codeclimate.com/github/orisano/go-adal"><img src="https://codeclimate.com/github/orisano/go-adal/badges/gpa.svg" alt="Code Climate"></img></a>
 <a href="https://codeclimate.com/github/orisano/go-adal/coverage"><img src="https://codeclimate.com/github/orisano/go-adal/badges/coverage.svg" /></a>
 
-unofficial Active Directory Authentication Library for golang
+unofficial Active Directory Authentication Library for go.
+
+## Installation
+```
+go get github.com/orisano/go-adal
+```
 
 ## How to Use
 ```go
