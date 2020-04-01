@@ -9,7 +9,7 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/pkg/errors"
+	"golang.org/x/xerrors"
 )
 
 const (
@@ -27,14 +27,14 @@ type Authority struct {
 func NewAuthority(urlStr string, validateAuthority bool) (*Authority, error) {
 	parsedURL, err := url.ParseRequestURI(urlStr)
 	if err != nil {
-		return nil, errors.Wrapf(err, "url parse failed: %s", urlStr)
+		return nil, xerrors.Errorf("parse url: %w", err)
 	}
 	if err := validateAuthorityURL(parsedURL); err != nil {
-		return nil, errors.Wrapf(err, "invalid authority url: %s", parsedURL.String())
+		return nil, xerrors.Errorf("validate(url=%s): %w", parsedURL.String(), err)
 	}
 	host, tenant, err := parseAuthority(parsedURL)
 	if err != nil {
-		return nil, errors.Wrapf(err, "authority parse failed")
+		return nil, xerrors.Errorf("parse authority(url=%s): %w", parsedURL.String(), err)
 	}
 
 	return &Authority{
@@ -75,7 +75,7 @@ func (a *Authority) Validate(httpClient *http.Client) error {
 
 	u, err := url.ParseRequestURI(instanceDiscoveryEndpoint)
 	if err != nil {
-		return errors.Wrapf(err, "invalid instance discovery endpoint, make a github issue")
+		panic(err)
 	}
 
 	query := url.Values{}
@@ -90,7 +90,7 @@ func (a *Authority) Validate(httpClient *http.Client) error {
 	defer resp.Body.Close()
 
 	if resp.StatusCode < 200 || 300 <= resp.StatusCode {
-		return errors.Errorf("instance discovery request failed: expected 2xx, actual %s", resp.Status)
+		return xerrors.Errorf("instance discovery request(expected=2xx, actual=%s)", resp.Status)
 	}
 
 	var out struct {
@@ -98,11 +98,11 @@ func (a *Authority) Validate(httpClient *http.Client) error {
 	}
 	decoder := json.NewDecoder(resp.Body)
 	if err := decoder.Decode(&out); err != nil {
-		return errors.Wrapf(err, "failed to parse response")
+		return xerrors.Errorf("parse instance discovery response: %w", err)
 	}
-	io.Copy(ioutil.Discard, resp.Body)
+	_, _ = io.Copy(ioutil.Discard, resp.Body)
 	if len(out.TenantDiscoveryEndpoint) == 0 {
-		return errors.New("failed to parse instance discovery")
+		return xerrors.New("`tenant_discovery_endpoint` was not found")
 	}
 	a.validated = true
 	return nil
@@ -118,10 +118,10 @@ func (a *Authority) Validated() bool {
 
 func validateAuthorityURL(aURL *url.URL) error {
 	if aURL.Scheme != "https" {
-		return errors.New("the authority url must be an https endpoint")
+		return xerrors.New("the authority url must be an https endpoint")
 	}
 	if len(aURL.RawQuery) != 0 {
-		return errors.New("the authority url must not have a query string")
+		return xerrors.New("the authority url must not have a query string")
 	}
 	return nil
 }
@@ -130,7 +130,7 @@ func parseAuthority(aURL *url.URL) (string, string, error) {
 	host := aURL.Host
 	pathParts := strings.Split(aURL.Path, "/")
 	if len(pathParts) == 1 || len(pathParts[1]) == 0 {
-		return "", "", errors.New("could not determine tenant")
+		return "", "", xerrors.New("could not determine tenant")
 	}
 	tenant := pathParts[1]
 	return host, tenant, nil

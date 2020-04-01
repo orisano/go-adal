@@ -5,7 +5,7 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/pkg/errors"
+	"golang.org/x/xerrors"
 )
 
 func testInvalidAuthority(t *testing.T, urlStr string, validateAuthority bool) error {
@@ -31,7 +31,7 @@ func TestNewAuthority(t *testing.T) {
 	t.Run("emptyURL", func(t *testing.T) {
 		err := testInvalidAuthority(t, "", true)
 
-		switch errors.Cause(err).(type) {
+		switch xerrors.Unwrap(err).(type) {
 		case *url.Error:
 			break
 		default:

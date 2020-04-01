@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/pkg/errors"
 	"golang.org/x/oauth2/clientcredentials"
+	"golang.org/x/xerrors"
 )
 
 type AuthenticationContext struct {
@@ -16,7 +16,7 @@ type AuthenticationContext struct {
 
 func NewAuthenticationContext(tenant string, opts ...Option) (*AuthenticationContext, error) {
 	if len(tenant) == 0 {
-		return nil, errors.New("missing tenant")
+		return nil, xerrors.New("missing tenant")
 	}
 
 	options := defaultOption()
@@ -27,7 +27,7 @@ func NewAuthenticationContext(tenant string, opts ...Option) (*AuthenticationCon
 
 	authority, err := NewAuthority(authorityURL, options.ValidateAuthority)
 	if err != nil {
-		return nil, errors.Wrap(err, "authority create failed")
+		return nil, xerrors.Errorf("create authority: %w", err)
 	}
 	return &AuthenticationContext{
 		Authority: authority,
@@ -36,13 +36,13 @@ func NewAuthenticationContext(tenant string, opts ...Option) (*AuthenticationCon
 
 func (a *AuthenticationContext) Client(ctx context.Context, resource, clientID, clientSecret string) (*http.Client, error) {
 	if len(resource) == 0 {
-		return nil, errors.New("missing resource")
+		return nil, xerrors.New("missing resource")
 	}
 	if len(clientID) == 0 {
-		return nil, errors.New("missing clientID")
+		return nil, xerrors.New("missing clientID")
 	}
 	if len(clientSecret) == 0 {
-		return nil, errors.New("missing clientSecret")
+		return nil, xerrors.New("missing clientSecret")
 	}
 	config := &clientcredentials.Config{
 		ClientID:     clientID,
