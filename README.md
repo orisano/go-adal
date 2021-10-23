@@ -1,5 +1,5 @@
 # go-ADAL
-<a href="https://travis-ci.com/orisano/go-adal"><img src="https://travis-ci.com/orisano/go-adal.svg?branch=master" alt="Build Status"></img></a>
+[![Build Status](https://app.travis-ci.com/orisano/go-adal.svg?branch=master)](https://app.travis-ci.com/orisano/go-adal)
 <a href="https://codeclimate.com/github/orisano/go-adal"><img src="https://codeclimate.com/github/orisano/go-adal/badges/gpa.svg" alt="Code Climate"></img></a>
 <a href="https://codeclimate.com/github/orisano/go-adal/coverage"><img src="https://codeclimate.com/github/orisano/go-adal/badges/coverage.svg" /></a>
 
