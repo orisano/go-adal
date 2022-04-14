@@ -2,11 +2,11 @@ module github.com/orisano/go-adal
 
 require (
 	github.com/golang/protobuf v1.5.2 // indirect
-	golang.org/x/net v0.0.0-20220225172249-27dd8689420f // indirect
-	golang.org/x/oauth2 v0.0.0-20220223155221-ee480838109b
-	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1
+	golang.org/x/net v0.0.0-20220412020605-290c469a71a5 // indirect
+	golang.org/x/oauth2 v0.0.0-20220411215720-9780585627b5
+	golang.org/x/xerrors v0.0.0-20220411194840-2f41105eb62f
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/protobuf v1.27.1 // indirect
+	google.golang.org/protobuf v1.28.0 // indirect
 )
 
 go 1.13
